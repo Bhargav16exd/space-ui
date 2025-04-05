@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react"
 import { useParams } from "react-router-dom"
 import { io } from "socket.io-client";
 import { BACKEND_URL } from "../../constants";
+import NavigationBar from "../components/NavigationBar";
 
 
 export default function SpaceMasterPage(){
@@ -20,7 +21,6 @@ export default function SpaceMasterPage(){
     })
 
 
-
     useEffect(()=>{
 
         socket.current = io(BACKEND_URL,{
@@ -33,8 +33,13 @@ export default function SpaceMasterPage(){
             }
         })
 
+        return () => {
+            socket.current.disconnect();
+        }
+
     },[])
 
+  
 
 
     function handleChange(e,index){
@@ -156,27 +161,50 @@ export default function SpaceMasterPage(){
 
 
     return(
-        <div className="bg-[#F9FBFD] min-h-screen w-screen py-6 flex flex-col justify-center items-center px-4 ">
+    <>
 
-            <h1>Space Master page</h1>
-            <h1>Connected Space : {uniqueSpaceName}</h1>
+      <NavigationBar/>
 
-            <div className="min-h-screen bg-white w-full max-w-4xl border border-gray-200 shadow-md py-16 px-6 text-center">
-            {
-                data.content.map((item,index) => {
-                    return(
-                        <div key={index}>
-                            <TextAreaComponent item={item} index={index} pRef={pRef} handleChange={handleChange} handleKeyDown={handleKeyDown} onClickFocus={handleOnClick}/>
-                        </div>
-                    )
-                })
-            }
-            </div>
-            
+      <div className="bg-[#F9FAFB] min-h-screen w-screen py-6 flex flex-col justify-center items-center px-4 pb-16 ">
 
-            
-            
+      <div className="w-full max-w-6xl flex flex-col-reverse gap-6 md:flex-row">
+
+        {/* Writing Canvas */}
+        <div className="min-h-screen bg-white w-full md:mx-8 max-w-3xl border border-gray-100 rounded-xl shadow-md py-16 px-6 text-center">
+          {
+              data.content.map((item,index) => {
+                  return(
+                      <div key={index}>
+                          <TextAreaComponent item={item} index={index} pRef={pRef} handleChange={handleChange} handleKeyDown={handleKeyDown} onClickFocus={handleOnClick}/>
+                      </div>
+                  )
+              })
+          }
         </div>
+
+        {/* Space Information */}
+        <div className="h-fit bg-white p-6 rounded-xl border border-gray-100 shadow-xs">
+
+            <h1 className="text-lg font-bold text-gray-800 mb-4">
+              Space Information
+            </h1>
+
+            <p className="text-sm text-gray-500 mb-2">
+              Username : {username}
+            </p>
+
+            <p className="text-sm text-gray-500 mb-2">
+              Space-name : {uniqueSpaceName}
+            </p>
+        </div>
+
+
+      </div>
+
+      </div>
+    
+    </>
+        
     )
 }
 

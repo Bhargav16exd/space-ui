@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import {toast} from "sonner"
 import {useDispatch} from "react-redux"
 import { handleSignupAPI } from "../redux/slices/authSlice";
+import NavigationBar from "../components/NavigationBar";
 
 export default function Signup (){
 
@@ -55,9 +56,14 @@ export default function Signup (){
     }
 
     return (
+
+        <>
+
+        <NavigationBar/>
+        
         <div className="h-screen w-screen bg-[#f3f4f6] flex justify-center items-center">
 
-            <form className="h-auto w-[80%] flex justify-center items-center flex-col bg-[#ffffff] border rounded-lg py-4 px-6 sm:w-[35%]">
+            <form className="h-auto w-[80%] flex justify-center items-center flex-col bg-[#ffffff] border border-gray-200 rounded-lg py-4 px-6 sm:w-[35%]">
                 <div className="w-full flex justify-center items-start flex-col my-2">
 
                     <h1 className=" font-semibold text-3xl my-2">Sign Up for Log</h1>
@@ -68,21 +74,21 @@ export default function Signup (){
                     <label className="my-1 font-medium">
                         Username
                     </label>
-                    <input  autoComplete="new-username" type="text" placeholder="Enter your username" name="username"  value={signupData.username} onChange={handleChange} className="my-1 outline-none border rounded-md w-full py-2 px-2"  />
+                    <input  autoComplete="new-username" type="text" placeholder="Enter your username" name="username"  value={signupData.username} onChange={handleChange} className="my-1 outline-none border border-gray-200 rounded-md w-full py-2 px-2"  />
                 </div>
                 <div className="w-full flex justify-center items-start flex-col my-2">
                     <label className="my-1 font-medium">
                         Password
                     </label>
-                    <input autoComplete="new-password" type="password" placeholder="Create a password" name="password" value={signupData.password}  onChange={handleChange} className="my-1 outline-none border rounded-md w-full py-2 px-2"  />
+                    <input autoComplete="new-password" type="password" placeholder="Create a password" name="password" value={signupData.password}  onChange={handleChange} className="my-1 outline-none border border-gray-200 rounded-md w-full py-2 px-2"  />
                 </div>
                 <div className="w-full flex justify-center items-start flex-col my-2">
                     <label className="my-1 font-medium">
                         Confirm Password
                     </label>
-                    <input  autoComplete="new-password" type="password" placeholder="Confirm your password" name="confirmPassword" value={signupData.confirmPassword} onChange={handleChange} className="my-1 outline-none border rounded-md w-full py-2 px-2"  />
+                    <input  autoComplete="new-password" type="password" placeholder="Confirm your password" name="confirmPassword" value={signupData.confirmPassword} onChange={handleChange} className="my-1 outline-none border border-gray-200 rounded-md w-full py-2 px-2"  />
                 </div>
-                <div className="my-1 bg-black text-white text-center border rounded-md w-full py-2 px-2" onClick={handleSubmit}>
+                <div className="my-1 bg-black text-white text-center border border-gray-200 rounded-md w-full py-2 px-2" onClick={handleSubmit}>
                     Sign Up
                 </div>
                 <div className="text-base my-3 text-gray-600 flex">
@@ -91,5 +97,7 @@ export default function Signup (){
             </form>
 
         </div>
+
+        </>
     );
 }

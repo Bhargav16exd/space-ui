@@ -6,6 +6,7 @@ import ClientPage from './Pages/ClientPage'
 import LandingPage from './Pages/LandingPage'
 import Sigin from './Pages/SigninPage'
 import Signup from './Pages/SignupPage'
+import SecuredRoutes from "./utils/SecuredRoutes"
 
 function App() {
 
@@ -14,11 +15,16 @@ function App() {
 
       <Route path='/' element={<LandingPage/>}></Route>
 
-      <Route path='/login' element={<Sigin/>}></Route>
-      <Route path='/signup' element={<Signup/>}></Route>
+        <Route path='/login' element={<Sigin/>}></Route>
+        <Route path='/signup' element={<Signup/>}></Route>
 
-      <Route path='/homepage' element={<Homepage/>}></Route>
-      <Route path='/master/:username/:uniqueSpaceName' element={<SpaceMasterPage/>}></Route>
+      {/* Secured Routes */}
+      <Route element={<SecuredRoutes/>}>
+        <Route path='/homepage' element={<Homepage/>}></Route>
+        <Route path='/master/:username/:uniqueSpaceName' element={<SpaceMasterPage/>}></Route>
+      </Route>
+
+    
       <Route path='/joinee/:username/:uniqueSpaceName' element={<ClientPage/>}></Route>
     
 
