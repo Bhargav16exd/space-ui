@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import {io}          from "socket.io-client"
 import NavigationBar from "../components/NavigationBar";
+import { BACKEND_URL } from "../../constants";
 
 export default function ClientPage(){
 
@@ -15,7 +16,7 @@ export default function ClientPage(){
    
     useEffect(()=>{
 
-        socket = io('http://localhost:9000',{
+        socket = io(BACKEND_URL,{
             query:{
                 space:`${username}/${uniqueSpaceName}`,
                 role :'Joinee'
