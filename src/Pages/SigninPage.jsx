@@ -3,8 +3,7 @@ import { Link } from "react-router-dom";
 import {useDispatch, useSelector} from "react-redux"
 import { useNavigate } from "react-router-dom";
 import { handleSigninAPI } from "../redux/slices/authSlice";
-import NavigationBar from "../Components/NavigationBar";
-
+import NavigationBar from "../components/NavigationBar";
 
 
 export default function Sigin (){
