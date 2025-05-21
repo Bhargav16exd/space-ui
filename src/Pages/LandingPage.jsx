@@ -2,6 +2,8 @@ import { useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import Footer from "../components/Footer"
 import NavigationBar from "../components/NavigationBar"
+import axios from "axios"
+import { BACKEND_URL } from "../../constants"
 
 
 
@@ -9,6 +11,7 @@ export default function LandingPage(){
 
 
     const navigate = useNavigate()
+    const [emptyInputsErrorExist , setEmptyInputErrorExist] = useState(false)
 
     const [urlData , setUrlData] = useState({
         username:'',
@@ -27,8 +30,37 @@ export default function LandingPage(){
 
     }
 
-    function handleSubmit(){
-        navigate(`/joinee/${urlData.username}/${urlData.spacename}`)
+    function handleTimeout(){
+        setTimeout(() => {
+                setEmptyInputErrorExist(false)
+        }, 5000);
+    }
+
+    async function handleSubmit(){
+
+        const {username , spacename} = urlData
+
+        if(!username || !spacename){
+            setEmptyInputErrorExist(true)
+            handleTimeout()
+            return
+        }
+
+        if(!username.trim() || !spacename.trim()){
+            setEmptyInputErrorExist(true)
+            handleTimeout()
+            return
+        }
+
+        const res = await axios.get(`${BACKEND_URL}/api/v1/space/exists/${username}/${spacename}`)
+
+        if (res?.data?.exist){
+            navigate(`/joinee/${urlData.username}/${urlData.spacename}`)
+        }else{
+            setEmptyInputErrorExist(true)
+            handleTimeout()
+            return
+        }
     }
 
     
@@ -47,7 +79,7 @@ export default function LandingPage(){
                 </span>
 
                 <h1 className=" tracking-tight text-center font-bold text-6xl text-wrap my-10  md:text-8xl bg-[linear-gradient(to_right,#101827,#333a47,#101827)] text-transparent bg-clip-text ">
-                    Collabrate in Real-Time
+                    Collaborate in Real-Time
                 </h1>
 
                 <p className="text-center tracking-tight text-gray-600 my-2 md:text-xl max-w-2xl">
@@ -75,6 +107,15 @@ export default function LandingPage(){
                         <div className="text-lg text-gray-300 hidden md:block">/</div>
 
                         <input type="text" placeholder="space name" className="text-sm w-full outline-none text-center border border-gray-300 bg-white py-4 my-2 rounded-xl" name="spacename" value={urlData.spacename} onChange={handleChange}/>
+
+                        {
+                            emptyInputsErrorExist ? 
+                            <p className="text-center text-red-500 text-sm my-2">
+                                Invalid Inputs
+                            </p> : <></>
+
+                        }
+                       
 
                         <button className="w-full bg-[#101827] md:max-w-32 text-sm font-semibold text-white rounded-lg py-4 px-6 cursor-pointer" onClick={handleSubmit}>Join Space</button>
                     </span>

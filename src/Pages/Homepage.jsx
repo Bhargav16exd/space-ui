@@ -18,6 +18,7 @@ export default function Homepage(){
 
     async function onClick(){
 
+        
         const res = await axios.post(`${BACKEND_URL}/api/v1/space/createSpace`,
         {name:name},
         {
