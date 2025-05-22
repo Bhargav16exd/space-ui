@@ -36,6 +36,14 @@ export default function LandingPage(){
         }, 5000);
     }
 
+    /*
+        Note : Two types of validation are required here 
+                1) where user puts data in input field it should return if valid space exist or not
+                2) if someone directly tries to access the page it should first verify if space exist 
+
+        Conclusion : Used two validation , when user goes access page by form or directly access page by URL 
+    */
+
     async function handleSubmit(){
 
         const {username , spacename} = urlData
@@ -108,19 +116,18 @@ export default function LandingPage(){
 
                         <input type="text" placeholder="space name" className="text-sm w-full outline-none text-center border border-gray-300 bg-white py-4 my-2 rounded-xl" name="spacename" value={urlData.spacename} onChange={handleChange}/>
 
-                        {
-                            emptyInputsErrorExist ? 
-                            <p className="text-center text-red-500 text-sm my-2">
-                                Invalid Inputs
-                            </p> : <></>
-
-                        }
-                       
-
                         <button className="w-full bg-[#101827] md:max-w-32 text-sm font-semibold text-white rounded-lg py-4 px-6 cursor-pointer" onClick={handleSubmit}>Join Space</button>
                     </span>
 
-                    <p className="text-center text-gray-600 text-sm my-8">
+                     {
+                            emptyInputsErrorExist ? 
+                            <p className="text-center text-red-500 text-sm my-6 ">
+                                Invalid Inputs
+                            </p> : <></>
+
+                    }
+
+                    <p className="text-center text-gray-600 text-sm my-8 md:mt-4 md:mb-8">
                         Enter a username and space name to join an existing collaboration
                     </p>
 

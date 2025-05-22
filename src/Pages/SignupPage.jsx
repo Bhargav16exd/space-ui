@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {toast} from "sonner"
-import {useDispatch} from "react-redux"
+import {useDispatch, useSelector} from "react-redux"
 import { handleSignupAPI } from "../redux/slices/authSlice";
 import NavigationBar from "../components/NavigationBar";
 
@@ -9,6 +9,14 @@ export default function Signup (){
 
     const dispatch = useDispatch()
     const navigate = useNavigate()
+    const isLoggedIn = useSelector((state)=>state?.auth?.loggedInStatus)
+
+
+    useEffect(()=>{
+            if(isLoggedIn){
+                navigate('/homepage')
+            }
+    },[])
 
     const [signupData,setSignupData] = useState({
         username:"",

@@ -77,7 +77,7 @@ export default function Homepage(){
                             spaces.length > 0 ? 
 
                             spaces.map((space)=>(
-                            <div className="text-sm my-8 py-4 px-4 rounded-xl border border-gray-100">
+                            <div className="text-sm my-8 py-4 px-4 rounded-xl border border-gray-100" key={space.name}>
                                 {space?.name}
                             </div>))
 
