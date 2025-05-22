@@ -4,12 +4,14 @@ import {io}          from "socket.io-client"
 import NavigationBar from "../components/NavigationBar";
 import { BACKEND_URL } from "../../constants";
 import axios from "axios";
+import people from "../assets/people.png"
 
 export default function ClientPage(){
 
     const {uniqueSpaceName} = useParams()
     const {username}        = useParams()
     const [isSecured , setIsSecured] = useState(null)
+    const [peopleCount , setPeopleCount] = useState(1)
     const navigate = useNavigate()
 
 
@@ -32,6 +34,7 @@ export default function ClientPage(){
     useEffect(()=>{
 
         checkIsSecured()
+
         socket = io(BACKEND_URL,{
             query:{
                 space:`${username}/${uniqueSpaceName}`,
@@ -41,6 +44,10 @@ export default function ClientPage(){
 
         socket.on("chat",(val)=>{
             setData(val)
+        })
+
+        socket.on('user-joined',(val)=>{
+            setPeopleCount(val)
         })
 
     },[])
@@ -101,6 +108,18 @@ export default function ClientPage(){
                         <p className="text-sm text-gray-500 mb-2">
                         Space-name : {uniqueSpaceName}
                         </p>
+
+                        <div>
+
+                            <span className=" flex justify-start items-center gap-4 my-4">
+                                <img src={people} alt="" className="h-5 w-5" />
+
+                                <h1 className="text-green-800 bg-green-100 py-0.5 px-4 rounded-full ">
+                                    {peopleCount} online
+                                </h1>
+                            </span>
+                        </div>
+
                     </div>
 
 

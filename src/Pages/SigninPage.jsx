@@ -12,7 +12,7 @@ export default function Sigin (){
     const isLoggedIn = useSelector((state)=>state?.auth?.loggedInStatus)
     const dispatch = useDispatch()
     const navigate = useNavigate()
-
+    
     useEffect(()=>{
         if(isLoggedIn){
             navigate('/homepage')
