@@ -48,7 +48,6 @@ export const handleSigninAPI = createAsyncThunk(
             return (await response).data
             
         } catch (error) {
-            console.log(error)
             toast.error(error.response.data.message)
         }
     }
@@ -87,13 +86,18 @@ const authSlice = createSlice({
         builder
         .addCase(handleSigninAPI.fulfilled , (state,action)=>{
 
-            console.log(action.payload?.data)
+            //Set Local Storage Only If Login is successfull
+            if( action.payload?.statusCode == 201 && action.payload?.success == true ){
 
-            localStorage.setItem("token",action.payload?.data?.token)
-            localStorage.setItem("loggedInStatus",JSON.stringify(true))
+                localStorage.setItem("token",action.payload?.data?.token)
+                localStorage.setItem("loggedInStatus",JSON.stringify(true))
+                
+                state.loggedInStatus = true
+                state.token          = action.payload?.data?.token 
 
-            state.loggedInStatus = true
-            state.token          = action.payload?.data?.token 
+            }
+
+            
 
         })
         .addCase(handleLogoutAPI.fulfilled , (state,action)=>{
