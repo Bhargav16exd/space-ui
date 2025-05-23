@@ -28,28 +28,26 @@ export default function ClientPage(){
         }
     }
 
+    async function getLatestData(){
+
+        const space = `${username}/${uniqueSpaceName}`
+
+        const res = await axios.post(`${BACKEND_URL}/api/v1/space/latest` ,{space})
+
+        if(res?.data?.data){
+            const val = res?.data?.data?.content
+            const countVal = res?.data?.data?.count
+            setData(val)
+            setPeopleCount(countVal)
+        }
+
+    }
+
     let socket ;
 
    
     useEffect(()=>{
-
         checkIsSecured()
-
-        socket = io(BACKEND_URL,{
-            query:{
-                space:`${username}/${uniqueSpaceName}`,
-                role :'Joinee'
-            }
-        })
-
-        socket.on("chat",(val)=>{
-            setData(val)
-        })
-
-        socket.on('user-joined',(val)=>{
-            setPeopleCount(val)
-        })
-
     },[])
 
 
@@ -57,6 +55,27 @@ export default function ClientPage(){
 
         if(isSecured== false){
             navigate('/');
+        }
+
+        if(isSecured){
+
+            getLatestData()
+
+            socket = io(BACKEND_URL,{
+                query:{
+                    space:`${username}/${uniqueSpaceName}`,
+                    role :'Joinee'
+                }
+            })
+
+            socket.on("chat",(val)=>{
+                setData(val)
+            })
+
+            socket.on('user-joined',(val)=>{
+                setPeopleCount(val)
+            })
+
         }
 
     },[isSecured])
