@@ -6,16 +6,31 @@ import NavigationBar from "../components/NavigationBar"
 import Stack from "../assets/stack.png"
 import up from "../assets/up.png"
 import down from "../assets/down.png"
+import archive from "../assets/archive.png"
 
 export default function Homepage(){
 
     const navigate = useNavigate()
     const [name,setName] = useState("")
-    const [spaces,setSpaces] = useState([])
     const [isOpen , setIsOpen] = useState(false)
     const [dropDownValue , setDropDownValue] = useState('')
 
+    const [showRecentSpace , setShowRecentSpace] = useState(true)
+    const [showArchiveSpace , setShowArchiveSpace] = useState(false)
+
     const selfDestructTime = ['1hr' , '6hr' , '12hr' , '24hr']
+
+
+    function handleShowRecentSpace(){
+        setShowRecentSpace(true)
+        setShowArchiveSpace(false)
+    }
+
+    function handleShowArchiveSpace(){
+        setShowArchiveSpace(true)
+        setShowRecentSpace(false)
+
+    }
 
 
     function handleOnSelectDropDownItem(time){
@@ -94,27 +109,32 @@ export default function Homepage(){
 
                     <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-xs ">
 
-                        <span className="flex justify-start items-center gap-2">
-                            <img src={Stack} alt="Stack Logo" className="h-5 w-5" />
-                            <p className="text-xl font-bold">
-                                Recent Spaces
-                            </p>
+                        <span className="flex py-2 rounded-xl">
+                            <span className={` w-1/2 flex justify-center items-center gap-4 mx-2 rounded-xl cursor-pointer ${showRecentSpace && 'border border-gray-200' }`} onClick={handleShowRecentSpace}>
+                                <img src={Stack} alt="Stack Logo" className="h-5 w-5" />
+                                <p className="text-xl font-bold">
+                                    Recent
+                                </p>
+                            </span>
+                            <span className={`w-1/2 flex justify-center items-center gap-4 mx-2 cursor-pointer rounded-xl ${ showArchiveSpace && 'border border-gray-200' } `} onClickCapture={handleShowArchiveSpace}>
+                               <img src={archive} alt="Stack Logo" className="h-10 w-10" />
+                                <p className="text-xl font-bold">
+                                    Archive
+                                </p>
+
+                            </span>
+                           
                         </span>
 
+
                         {
-                            spaces.length > 0 ? 
-
-                            spaces.map((space)=>(
-                            <div className="text-sm my-8 py-4 px-4 rounded-xl border border-gray-100" key={space.name}>
-                                {space?.name}
-                            </div>))
-
-                            :
-                            
-                            <div className="text-sm my-8 py-4 px-4 rounded-xl border border-gray-100">
-                                No Spaces Found
-                            </div>
+                            showRecentSpace && <RecentSpaceComponent/>
                         }
+
+                        {
+                            showArchiveSpace && <ArchiveSpaceComponent/>
+                        }
+
 
                         
                     </div>
@@ -215,6 +235,94 @@ export default function Homepage(){
             </div>
         </section>
         
+    )
+}
+
+
+function RecentSpaceComponent(){
+
+    const [spaces,setSpaces] = useState([])
+
+    async function getAllSpaceDetails(){
+
+        const res = await axios.get(`${BACKEND_URL}/api/v1/space/recent`,
+        {
+            headers:{Authorization:`Bearer ${localStorage.getItem("token")}`}
+        })
+
+        if(res?.data.statusCode == 200){
+            setSpaces(res?.data?.data)
+        }
+    }
+
+    useEffect(()=>{
+      getAllSpaceDetails()
+    },[])
+
+    return(
+        <div className="p-6">
+
+            {
+                spaces.length > 0 ? 
+
+                    spaces.map((space)=>(
+                        <div className="text-sm my-8 py-4 px-4 rounded-xl border border-gray-100" key={space.name}>
+                            {space?.name}
+                        </div>))
+
+                        :
+                            
+                        <div className="text-sm my-8 py-4 px-4 rounded-xl border border-gray-100">
+                            No Spaces Found
+                        </div>
+            }
+
+                        
+        </div>
+    )
+}
+
+function ArchiveSpaceComponent(){
+
+    const [spaces,setSpaces] = useState([])
+
+    async function getAllSpaceDetails(){
+
+        const res = await axios.get(`${BACKEND_URL}/api/v1/space/archive`,
+        {
+            headers:{Authorization:`Bearer ${localStorage.getItem("token")}`}
+        })
+
+        if(res?.data.statusCode == 200){
+            setSpaces(res?.data?.data)
+        }
+    }
+
+    useEffect(()=>{
+      getAllSpaceDetails()
+    },[])
+
+    return(
+        
+         <div className="p-6">
+
+            {
+                spaces.length > 0 ? 
+
+                    spaces.map((space)=>(
+                        <div className="text-sm my-8 py-4 px-4 rounded-xl border border-gray-100" key={space.name}>
+                            {space?.name}
+                        </div>))
+
+                        :
+                            
+                        <div className="text-sm my-8 py-4 px-4 rounded-xl border border-gray-100">
+                            No Spaces Found
+                        </div>
+            }
+
+                        
+        </div>
     )
 }
 
