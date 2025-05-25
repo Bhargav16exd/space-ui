@@ -4,12 +4,28 @@ import {BACKEND_URL} from "../../constants"
 import { useEffect, useState } from "react"
 import NavigationBar from "../components/NavigationBar"
 import Stack from "../assets/stack.png"
+import up from "../assets/up.png"
+import down from "../assets/down.png"
 
 export default function Homepage(){
 
     const navigate = useNavigate()
     const [name,setName] = useState("")
     const [spaces,setSpaces] = useState([])
+    const [isOpen , setIsOpen] = useState(false)
+    const [dropDownValue , setDropDownValue] = useState('')
+
+    const selfDestructTime = ['1hr' , '6hr' , '12hr' , '24hr']
+
+
+    function handleOnSelectDropDownItem(time){
+        setDropDownValue(time)
+        setIsOpen(!isOpen)
+    }
+
+    function handleDropdown(){
+        setIsOpen(!isOpen)
+    }
 
 
     function handleChange(e){
@@ -18,9 +34,21 @@ export default function Homepage(){
 
     async function onClick(){
 
+        if(!name){
+            return
+        }
+
+        if(!name.trim()){
+            return
+        }
+
+        if(!dropDownValue){
+            return
+        }
+
         
         const res = await axios.post(`${BACKEND_URL}/api/v1/space/createSpace`,
-        {name:name},
+        {name:name , selfDestructTime:dropDownValue},
         {
             headers:{Authorization:`Bearer ${localStorage.getItem("token")}`}
         })
@@ -114,6 +142,34 @@ export default function Homepage(){
                         <label htmlFor="" className="text-sm font-semibold">Space Name</label>
                         <input type="text" className="border border-gray-200 rounded-lg p-2 px-4 text-sm outline-none" placeholder="Enter space name " value={name} name="name" onChange={handleChange}/>
                     </div>
+
+
+                    <div className="mt-6 flex flex-col gap-2">
+                        <label htmlFor="" className="text-sm font-semibold">Self Destruct Time</label>
+                        <div className="border border-gray-200 rounded-lg p-2 px-4  outline-none cursor-pointer flex items-center justify-between " onClick={handleDropdown}>
+
+                            <span className="text-sm text-gray-500"> { dropDownValue ? dropDownValue : "Choose Self Destruct Time" }</span>
+                            {
+                                isOpen ?
+                                <img src={up} alt="Up Arrow Image" className="h-4 w-4"/>
+                                 :
+                                <img src={down} alt="Down Arrow Image" className="h-4 w-4" />
+                            }
+
+                        </div>
+
+                        {
+                                isOpen && (
+                                    <div className="border border-gray-200 rounded-lg py-2 px-2">
+                                        {
+                                            selfDestructTime.map((el)=>(
+                                                <DropDownComponent timeValue={el} key={el} handleOnSelectDropDownItem={handleOnSelectDropDownItem}/>
+                                            ))
+                                        }
+                                    </div>
+                                )
+                        }
+                    </div>
                     
                     <button onClick={onClick} className="cursor-pointer bg-[#101827] rounded-md text-sm text-white py-3 mt-6 px-4 w-full">Create Space</button>
 
@@ -160,4 +216,13 @@ export default function Homepage(){
         </section>
         
     )
+}
+
+
+function DropDownComponent({timeValue, handleOnSelectDropDownItem}){
+
+    return(
+        <div className=" p-2 px-4 ext-sm cursor-pointer flex items-center text-gray-500 rounded-lg hover:bg-gray-100" onClick={()=>handleOnSelectDropDownItem(timeValue)} >{timeValue}</div>
+    )
+
 }
