@@ -3,6 +3,9 @@ import { useParams } from "react-router-dom"
 import { io } from "socket.io-client";
 import { BACKEND_URL } from "../../constants";
 import NavigationBar from "../components/NavigationBar";
+import people from "../assets/people.png"
+import axios from "axios";
+
 
 
 export default function SpaceMasterPage(){
@@ -10,15 +13,81 @@ export default function SpaceMasterPage(){
 
     const {uniqueSpaceName} = useParams()
     const {username}        = useParams()
+    const [peopleCount , setPeopleCount] = useState(1)
     const pRef = useRef([])
     const [currentActiveComponentIndex , setCurrentActiveComponentIndex] = useState(0)
     let socket = useRef(null);
 
-    const [data , writeData] = useState({
+    const [data , writeData] = useState()
+
+    function writeDefaultCanvas(){
+
+       writeData({
         content : [
           {id:"1",inputType:"text",data:"" ,placeholder:"Enter your text here", style:"",image:"",imagePreview:""}
         ]
-    })
+
+      })
+
+    }
+
+    async function getLatestData(){
+
+        const space = `${username}/${uniqueSpaceName}`
+
+        const res = await axios.post(`${BACKEND_URL}/api/v1/space/latest` ,{space})
+
+        if(res?.data?.data){
+            const val = res?.data?.data?.content
+            const countVal = res?.data?.data?.count
+
+            if(val){
+              val.map((el)=>{
+
+                if(el.data){
+                  setIncomingAPIDataToWriteData(el)
+                }
+                
+              })
+            }
+            setPeopleCount(countVal)
+
+            if(!val){
+             writeDefaultCanvas()
+            }
+
+        }
+
+
+
+    }
+
+    function setIncomingAPIDataToWriteData(el){
+
+      writeData((prevData)=>{
+
+         if(prevData){
+            const newAppendedEl = {id:el?.id ,inputType:"text",data:el?.data ,placeholder:"Enter your text here", style:"",image:"",imagePreview:""}
+            const updatedData = {
+            ...prevData,
+            content : [ ...prevData?.content , newAppendedEl ]
+            }
+          return updatedData
+        }
+        else{
+
+           const newAppendedEl = {id:el?.id ,inputType:"text",data:el?.data ,placeholder:"Enter your text here", style:"",image:"",imagePreview:""}
+            const updatedData = {
+            content : [ newAppendedEl ]
+            }
+          return updatedData
+           
+        }
+
+         
+
+      })
+    }
 
 
     useEffect(()=>{
@@ -32,6 +101,12 @@ export default function SpaceMasterPage(){
                 token:localStorage.getItem("token")
             }
         })
+
+        socket.current.on('user-joined',(val)=>{
+                setPeopleCount(val)
+        })
+
+        getLatestData()
 
         return () => {
             socket.current.disconnect();
@@ -171,7 +246,10 @@ export default function SpaceMasterPage(){
 
         {/* Writing Canvas */}
         <div className="min-h-screen bg-white w-full md:mx-8 max-w-3xl border border-gray-100 rounded-xl shadow-md py-16 px-6 text-center">
+
           {
+            data ?
+            
               data.content.map((item,index) => {
                   return(
                       <div key={index}>
@@ -179,7 +257,14 @@ export default function SpaceMasterPage(){
                       </div>
                   )
               })
+          
+          :
+           <>
+            Loading
+           </>
+
           }
+          
         </div>
 
         {/* Space Information */}
@@ -196,6 +281,16 @@ export default function SpaceMasterPage(){
             <p className="text-sm text-gray-500 mb-2">
               Space-name : {uniqueSpaceName}
             </p>
+
+
+            <div>
+                <span className=" flex justify-start items-center gap-4 my-4">
+                <img src={people} alt="" className="h-5 w-5" />
+                <h1 className="text-green-800 bg-green-100 py-0.5 px-4 rounded-full ">
+                  {peopleCount} online
+                </h1>
+              </span>
+            </div>
         </div>
 
 
