@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react"
-import { useParams } from "react-router-dom"
+import { useNavigate, useParams } from "react-router-dom"
 import { io } from "socket.io-client";
 import { BACKEND_URL } from "../../constants";
 import NavigationBar from "../components/NavigationBar";
@@ -14,6 +14,7 @@ export default function SpaceMasterPage(){
     const {uniqueSpaceName} = useParams()
     const {username}        = useParams()
     const [peopleCount , setPeopleCount] = useState(1)
+    const navigate = useNavigate()
     const pRef = useRef([])
     const [currentActiveComponentIndex , setCurrentActiveComponentIndex] = useState(0)
     let socket = useRef(null);
@@ -37,6 +38,11 @@ export default function SpaceMasterPage(){
 
         const res = await axios.post(`${BACKEND_URL}/api/v1/space/latest` ,{space})
 
+        if(res?.data?.message == "No Such Space Exist"){
+          writeDefaultCanvas()
+          return
+        }
+
         if(res?.data?.data){
             const val = res?.data?.data?.content
             const countVal = res?.data?.data?.count
@@ -58,8 +64,9 @@ export default function SpaceMasterPage(){
 
         }
 
-
-
+        if(res?.data?.success == true && !res?.data?.data){
+          writeDefaultCanvas()
+        }
     }
 
     function setIncomingAPIDataToWriteData(el){
@@ -115,6 +122,24 @@ export default function SpaceMasterPage(){
     },[])
 
   
+    async function handleArchive(){
+
+      if(!data.content[0].data){
+        alert("Empty Space Cannot Be Archived")
+        return
+      }
+
+
+      const res = await axios.post(`${BACKEND_URL}/api/v1/space/archive` ,{spacename:uniqueSpaceName},{
+            headers:{Authorization:`Bearer ${localStorage.getItem("token")}`}
+      })
+
+      if(res?.data?.message == "Archived Successfully" && res?.data?.statusCode == 200 ){
+        navigate('/homepage')
+      }
+
+
+    }
 
 
     function handleChange(e,index){
@@ -291,6 +316,8 @@ export default function SpaceMasterPage(){
                 </h1>
               </span>
             </div>
+
+            <button className="bg-[#101827] rounded-md font-semibold text-white py-2 px-4 cursor-pointer my-6" onClick={handleArchive}>Archive</button>
         </div>
 
 
