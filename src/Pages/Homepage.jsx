@@ -14,7 +14,7 @@ export default function Homepage(){
     const [name,setName] = useState("")
     const [isOpen , setIsOpen] = useState(false)
     const [dropDownValue , setDropDownValue] = useState('')
-
+    const [refreshRecentSpaces, setRefreshRecentSpaces] = useState(false)
     const [showRecentSpace , setShowRecentSpace] = useState(true)
     const [showArchiveSpace , setShowArchiveSpace] = useState(false)
 
@@ -74,21 +74,41 @@ export default function Homepage(){
         
     }
 
-    async function getAllSpaceDetails(){
+    function handleJoinSpace(name){
 
-        const res = await axios.get(`${BACKEND_URL}/api/v1/space/getAllSpaces`,
+        if(!name){
+            return
+        }
+
+        if(!name.trim()){
+            return
+        }
+
+        navigate(`/master/${name}`)
+    }
+
+    async function handleDeleteSpace(name){
+
+        if(!name){
+            return
+        }
+
+        if(!name.trim()){
+            return
+        }
+
+
+        const res = await axios.post(`${BACKEND_URL}/api/v1/space/delete`,
+        {name},
         {
             headers:{Authorization:`Bearer ${localStorage.getItem("token")}`}
         })
 
         if(res?.data.statusCode == 200){
-            setSpaces(res?.data?.data)
+            setRefreshRecentSpaces(!refreshRecentSpaces);
         }
     }
 
-    useEffect(()=>{
-      getAllSpaceDetails()
-    },[])
 
     return(
         
@@ -107,7 +127,7 @@ export default function Homepage(){
                         Welcome back !
                     </h1>
 
-                    <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-xs ">
+                    <div className="bg-white py-6 px-2  md:p-6  rounded-xl border border-gray-100 shadow-xs ">
 
                         <span className="flex py-2 rounded-xl">
                             <span className={` w-1/2 flex justify-center items-center gap-4 mx-2 rounded-xl cursor-pointer ${showRecentSpace && 'border border-gray-200' }`} onClick={handleShowRecentSpace}>
@@ -128,11 +148,11 @@ export default function Homepage(){
 
 
                         {
-                            showRecentSpace && <RecentSpaceComponent/>
+                            showRecentSpace && <RecentSpaceComponent handleJoinSpace={handleJoinSpace} handleDeleteSpace={handleDeleteSpace} refreshRecentSpaces={refreshRecentSpaces}/>
                         }
 
                         {
-                            showArchiveSpace && <ArchiveSpaceComponent/>
+                            showArchiveSpace && <ArchiveSpaceComponent handleJoinSpace={handleJoinSpace} handleDeleteSpace={handleDeleteSpace} refreshRecentSpaces={refreshRecentSpaces}/>
                         }
 
 
@@ -239,7 +259,7 @@ export default function Homepage(){
 }
 
 
-function RecentSpaceComponent(){
+function RecentSpaceComponent({handleJoinSpace,handleDeleteSpace,refreshRecentSpaces}){
 
     const [spaces,setSpaces] = useState([])
 
@@ -253,11 +273,15 @@ function RecentSpaceComponent(){
         if(res?.data.statusCode == 200){
             setSpaces(res?.data?.data)
         }
+
+        if(res?.data.statusCode == 204){
+            setSpaces([])
+        }
     }
 
     useEffect(()=>{
       getAllSpaceDetails()
-    },[])
+    },[refreshRecentSpaces])
 
     return(
         <div className="p-6">
@@ -266,8 +290,17 @@ function RecentSpaceComponent(){
                 spaces.length > 0 ? 
 
                     spaces.map((space)=>(
-                        <div className="text-sm my-8 py-4 px-4 rounded-xl border border-gray-100" key={space.name}>
-                            {space?.name}
+                        <div className="text-sm my-8 py-4 px-4 rounded-xl border border-gray-100 flex justify-center items-start flex-col gap-4 md:flex-row md:justify-between" key={space.name}>
+
+                            <span className="my-2">
+                                {space?.name}
+                            </span>
+                            <div className="flex gap-6 my-1 justify-between ">
+                                <button className="bg-[#101827] rounded-md font-semibold text-white py-2 px-4 cursor-pointer" onClick={()=>handleJoinSpace(space.name)} >Join</button>    
+                                <button className="bg-red-500 rounded-md font-semibold text-white py-2 px-4 cursor-pointer"  onClick={()=>handleDeleteSpace(space.name)}>Delete</button>
+                            </div>
+                            
+                            
                         </div>))
 
                         :
@@ -282,7 +315,7 @@ function RecentSpaceComponent(){
     )
 }
 
-function ArchiveSpaceComponent(){
+function ArchiveSpaceComponent({handleJoinSpace,handleDeleteSpace,refreshRecentSpaces}){
 
     const [spaces,setSpaces] = useState([])
 
@@ -296,11 +329,16 @@ function ArchiveSpaceComponent(){
         if(res?.data.statusCode == 200){
             setSpaces(res?.data?.data)
         }
+
+        if(res?.data.statusCode == 204){
+            setSpaces([])
+        }
+
     }
 
     useEffect(()=>{
       getAllSpaceDetails()
-    },[])
+    },[refreshRecentSpaces])
 
     return(
         
@@ -310,8 +348,15 @@ function ArchiveSpaceComponent(){
                 spaces.length > 0 ? 
 
                     spaces.map((space)=>(
-                        <div className="text-sm my-8 py-4 px-4 rounded-xl border border-gray-100" key={space.name}>
-                            {space?.name}
+                        <div className="text-sm my-8 py-4 px-4 rounded-xl border border-gray-100 flex justify-center items-start flex-col gap-4 md:flex-row md:justify-between" key={space.name}>
+                            <span className="my-2">
+                                {space?.name}
+                            </span>
+                            <div className="flex gap-6 my-1 justify-between ">
+                                <button className="bg-[#101827] rounded-md font-semibold text-white py-2 px-4 cursor-pointer"  onClick={()=>handleJoinSpace(space.name)}>Join</button>    
+                                <button className="bg-red-500 rounded-md font-semibold text-white py-2 px-4 cursor-pointer"  onClick={()=> handleDeleteSpace(space.name)}>Delete</button>
+                            </div>
+                            
                         </div>))
 
                         :
